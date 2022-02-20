@@ -1,0 +1,5 @@
+version: v1
+name: buf.build/kzmake/_idempotency-key-api
+deps:
+  - buf.build/googleapis/googleapis
+  - buf.build/grpc-ecosystem/grpc-gateway

@@ -1,12 +1,12 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "echo/v1/echo.proto",
+    "title": "time/v1/time.proto",
     "version": "version not set"
   },
   "tags": [
     {
-      "name": "Echo"
+      "name": "Time"
     }
   ],
   "consumes": [
@@ -16,14 +16,14 @@
     "application/json"
   ],
   "paths": {
-    "/echo/v1/echo": {
+    "/v1/now": {
       "post": {
-        "operationId": "Echo_Echo",
+        "operationId": "Time_Now",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1EchoResponse"
+              "$ref": "#/definitions/v1NowResponse"
             }
           },
           "default": {
@@ -39,12 +39,12 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1EchoRequest"
+              "$ref": "#/definitions/v1NowRequest"
             }
           }
         ],
         "tags": [
-          "Echo"
+          "Time"
         ]
       }
     }
@@ -77,18 +77,13 @@
         }
       }
     },
-    "v1EchoRequest": {
-      "type": "object",
-      "properties": {
-        "msg": {
-          "type": "string"
-        }
-      }
+    "v1NowRequest": {
+      "type": "object"
     },
-    "v1EchoResponse": {
+    "v1NowResponse": {
       "type": "object",
       "properties": {
-        "msg": {
+        "now": {
           "type": "string"
         }
       }

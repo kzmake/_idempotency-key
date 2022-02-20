@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package kzmake.time.v1;
+option go_package = "github.com/kzmake/_idempotency-key/api/time/v1;time";
+
+import "google/api/annotations.proto";
+
+service Time {
+  rpc Now(NowRequest) returns (NowResponse) {
+    option (google.api.http) = {
+      post: "/v1/now"
+      body: "*"
+    };
+  }
+}
+
+message NowRequest {}
+
+message NowResponse {
+  string now = 1;
+}
