@@ -7,7 +7,7 @@ pre:
 
 .PHONY: fmt
 fmt:
-	goimports -l -local "github.com/kzmake/skeleton/backend/api/gateway" -w .
+	goimports -l -local "github.com/kzmake/_idempotency-key/backend/api/gateway" -w .
 
 .PHONY: lint
 lint:

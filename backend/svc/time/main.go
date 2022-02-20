@@ -18,16 +18,16 @@ import (
 	"golang.org/x/xerrors"
 	"google.golang.org/grpc"
 
-	pb "github.com/kzmake/skeleton/gen/go/greeter/v1"
+	pb "github.com/kzmake/_idempotency-key/gen/go/time/v1"
 
-	"github.com/kzmake/skeleton/backend/svc/greeter/handler"
+	"github.com/kzmake/_idempotency-key/backend/svc/time/handler"
 )
 
 type Env struct {
-	Address string `default:"0.0.0.0:5050"`
+	ServiceAddress string `default:"localhost:50051"`
 }
 
-const prefix = "GREETER"
+const prefix = "TIME"
 
 var env Env
 
@@ -48,7 +48,7 @@ func newGRPCServer() *grpc.Server {
 			grpc_recovery.UnaryServerInterceptor(),
 		)),
 	)
-	pb.RegisterGreeterServer(s, handler.NewGreeter())
+	pb.RegisterTimeServer(s, handler.NewTime())
 
 	return s
 }
@@ -62,7 +62,7 @@ func run() error {
 
 	grpcS := newGRPCServer()
 	g.Go(func() error {
-		lis, err := net.Listen("tcp", env.Address)
+		lis, err := net.Listen("tcp", env.ServiceAddress)
 		if err != nil {
 			return xerrors.Errorf("failed to listen: %w", err)
 		}

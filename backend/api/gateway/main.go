@@ -20,7 +20,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	timepb "github.com/kzmake/skeleton/gen/go/time/v1"
+	timepb "github.com/kzmake/_idempotency-key/gen/go/time/v1"
 )
 
 type Env struct {
