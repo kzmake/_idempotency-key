@@ -2,9 +2,34 @@
 apiVersion: skaffold/v2beta27
 kind: Config
 metadata:
+  name: redis
+deploy:
+  helm:
+    releases:
+      - name: redis
+        repo: https://charts.bitnami.com/bitnami
+        remoteChart: redis
+        setValues:
+          master.persistence.enabled: false
+          replica.persistence.enabled: false
+          auth.password: myredis
+          architecture: standalone
+          sentinel.enabled: false
+        wait: true
+---
+apiVersion: skaffold/v2beta27
+kind: Config
+metadata:
   name: app
 build:
   artifacts:
+    - image: ghcr.io/kzmake/idempotency-key/idempotency
+      docker:
+        {
+          dockerfile: Dockerfile.golang,
+          network: host,
+          buildArgs: { SERVICE_NAME: idempotency },
+        }
     - image: ghcr.io/kzmake/idempotency-key/time-gateway
       docker:
         {
@@ -36,6 +61,11 @@ portForward:
     namespace: default
     port: 8080
     localPort: 58080
+  - resourceType: service
+    resourceName: time-proxy
+    namespace: default
+    port: 8081
+    localPort: 58081
   - resourceType: service
     resourceName: time-service
     namespace: default
