@@ -1,74 +1,51 @@
-# skeleton: Golang用テンプレートプロジェクト
+# Idempotency-Key のサイドカーパターン実装
+## インフラ構成
 
-## テンプレートを利用してプロジェクトを始める
-### プロジェクトのパス変更
+もともと下記のようなサービスがあったとして、
 
-下記のコマンドを初回のみ実行してください。
-
-```bash
-./init.sh {{ user_name }}/{{ project_name }}
-
-# ex:
-#   ./init.sh hogehoge/fugafuga
+```
+client --request--> gateway --grpc--> service
 ```
 
-### マイクロサービスの追加
+そこに、Idempotency-Key を処理するproxyをサイドカーとして追加し、
 
-1. `api/{{ マイクロサービス名 }}/v1` にて.protoの追加
-1. `backend/svc/{{ マイクロサービス名 }}` にてgRPCアプリケーションの追加
-1. `Makefile` にて SERVICES 変数に `backend/svc/{{ マイクロサービス名 }}` を設定
-1. `manifests/base/svc-{{ マイクロサービス名 }}.yaml` としてマニフェストの追加
-1. `skaffold.app.yaml` にて追加したマイクロサービスのコンテナイメージのビルドを追加
-
-## Requirements
-
-このプロジェクトでは、
-
-- [buf](https://docs.buf.build/)
-
-などを使用します。初回のみ
-
-```bash
-make install
+```
+client --request--> sidecar --proxy-->gateway --grpc--> service
 ```
 
-で必要なツールをインストールしてください。
+とアプリケーションの実装なしで対応する例。
 
-## for developer
-### ProtocolBuffersからコードを生成＆フォーマットやLinterを実施する
-
-```bash
-make
-```
-
-### ローカル(kind)環境を準備する
+## 結果
 
 ```bash
-make kind
-```
+$ make http
+: --- 1st/2nd requests ---
+curl -i -XPOST -H "Idempotency-Key: 8e03978e-40d5-43e8-bc93-6894a57f9324" localhost:58081/v1/now&
+curl -i -XPOST -H "Idempotency-Key: 8e03978e-40d5-43e8-bc93-6894a57f9324" localhost:58081/v1/now
 
-### アプリケーションをビルド＆デプロイする
+HTTP/1.1 409 Conflict
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Sun, 20 Feb 2022 17:19:35 GMT
+Content-Length: 9
 
-```bash
-make dev
-```
+conflict
 
-### ローカル環境(kind)を削除する
+HTTP/1.1 200 OK
+Content-Length: 66
+Content-Type: application/json
+Date: Sun, 20 Feb 2022 17:19:38 GMT
+Grpc-Metadata-Content-Type: application/grpc
 
-```bash
-make clean
-```
+{"now":"2022-02-20 17:19:35.842370254 +0000 UTC m=+324.852386024"}
 
-## Production環境へのデプロイ
+: --- delay 3 sec ---
 
-下記のコマンドを実施することでデプロイできます。
+: --- 3rd request ---
+curl -s -XPOST -H "Idempotency-Key: 8e03978e-40d5-43e8-bc93-6894a57f9324" localhost:58081/v1/now
+{"now":"2022-02-20 17:19:35.842370254 +0000 UTC m=+324.852386024"}
 
-```bash
-make deploy-production
-```
-
-もし、デプロイ済みのアプリケーションを削除する場合は
-
-```bash
-make destroy-production
+:  --- 4rd request ---
+curl -s -XPOST -H "Idempotency-Key: 12345678-1234-4321-1234-123456789abc" localhost:58081/v1/now
+{"now":"2022-02-20 17:19:41.920781674 +0000 UTC m=+330.930797443"}
 ```
