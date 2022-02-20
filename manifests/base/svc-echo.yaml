@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: svc-echo
-          image: ghcr.io/kzmake/skeleton/svc-echo:latest
+          image: ghcr.io/kzmake/_idempotency-key/svc-echo:latest
           envFrom:
             - configMapRef:
                 name: common-config

@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: ghcr.io/kzmake/skeleton/api-gateway:latest
+          image: ghcr.io/kzmake/_idempotency-key/api-gateway:latest
           command:
             - /app
           envFrom:
