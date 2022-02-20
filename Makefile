@@ -60,8 +60,15 @@ destroy-production:
 
 .PHONY: http
 http:
-	curl -i -XPOST localhost:58080/v1/now
+	@printf "\033[96m# 1st request\033[0m\n"
+	curl -i -XPOST -H "Idempotency-Key: 8e03978e-40d5-43e8-bc93-6894a57f9324" localhost:58080/v1/now
+
+	@printf "\033[96m \n\n# 2nd request\033[0m\n"
+	curl -s -XPOST -H "Idempotency-Key: 8e03978e-40d5-43e8-bc93-6894a57f9324" localhost:58080/v1/now
+
+	@printf "\033[96m \n\n# 3rd request\033[0m\n"
+	curl -s -XPOST -H "Idempotency-Key: 12345678-1234-4321-1234-123456789abc" localhost:58080/v1/now
 
 .PHONY: grpc
 grpc:
-	grpcurl -protoset <(buf build -o -) -plaintext localhost:50001 kzmake.time.v1.Time/Now
+	grpcurl -protoset <(buf build -o -) -plaintext localhost:50051 kzmake.time.v1.Time/Now
