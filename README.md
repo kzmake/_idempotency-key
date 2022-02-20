@@ -10,7 +10,7 @@ client --request--> gateway --grpc--> service
 そこに、Idempotency-Key を処理するproxyをサイドカーとして追加し、
 
 ```
-client --request--> sidecar --proxy-->gateway --grpc--> service
+client --request--> sidecar:"Idempotency-Key を処理するproxy" --proxy--> gateway --grpc--> service
 ```
 
 とアプリケーションの実装なしで対応する例。
@@ -45,7 +45,17 @@ Grpc-Metadata-Content-Type: application/grpc
 curl -s -XPOST -H "Idempotency-Key: 8e03978e-40d5-43e8-bc93-6894a57f9324" localhost:58081/v1/now
 {"now":"2022-02-20 17:19:35.842370254 +0000 UTC m=+324.852386024"}
 
-:  --- 4rd request ---
+:  --- 4th request ---
 curl -s -XPOST -H "Idempotency-Key: 12345678-1234-4321-1234-123456789abc" localhost:58081/v1/now
 {"now":"2022-02-20 17:19:41.920781674 +0000 UTC m=+330.930797443"}
+```
+
+## Run
+
+```
+skaffold dev
+```
+
+```
+make http
 ```
