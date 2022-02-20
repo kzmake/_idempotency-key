@@ -11,7 +11,7 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 
-ARG SERVICE_NAME=svc/greeter
+ARG SERVICE_NAME=svc/time
 ARG CGO_ENABLED=0
 ARG GOOS=linux
 ARG GOARCH=amd64

@@ -2,32 +2,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: svc-echo
+  name: svc-time
 spec:
   selector:
     matchLabels:
-      app: svc-echo
+      app: svc-time
   template:
     metadata:
       labels:
-        app: svc-echo
-      annotations:
-        dapr.io/enabled: "true"
-        dapr.io/app-id: "svc-echo"
-        dapr.io/app-protocol: "grpc"
-        dapr.io/app-port: "5050"
-        dapr.io/log-as-json: "true"
-        dapr.io/log-level: "error"
-        dapr.io/config: "common-dapr-config"
+        app: svc-time
     spec:
       containers:
-        - name: svc-echo
-          image: ghcr.io/kzmake/_idempotency-key/svc-echo:latest
+        - name: svc-time
+          image: ghcr.io/kzmake/idempotency-key/svc-time:latest
           envFrom:
             - configMapRef:
                 name: common-config
             - configMapRef:
-                name: svc-echo-config
+                name: svc-time-config
               prefix: ECHO_
           resources:
             limits:
@@ -38,12 +30,12 @@ spec:
               memory: 32Mi
           ports:
             - name: grpc
-              containerPort: 5050
+              containerPort: 50051
           livenessProbe:
-            tcpSocket: { port: 5050 }
+            tcpSocket: { port: 50051 }
             initialDelaySeconds: 10
           readinessProbe:
-            tcpSocket: { port: 5050 }
+            tcpSocket: { port: 50051 }
             initialDelaySeconds: 5
             failureThreshold: 1
             periodSeconds: 1
@@ -51,19 +43,19 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: svc-echo
+  name: svc-time
 spec:
   type: ClusterIP
   selector:
-    app: svc-echo
+    app: svc-time
   ports:
     - name: grpc
-      port: 5050
-      targetPort: 5050
+      port: 50051
+      targetPort: 50051
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: svc-echo-config
+  name: svc-time-config
 data:
-  ADDRESS: 0.0.0.0:5050
+  SERVICEADDRESS: localhost:50051

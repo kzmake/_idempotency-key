@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: ghcr.io/kzmake/_idempotency-key/api-gateway:latest
+          image: ghcr.io/kzmake/idempotency-key/api-gateway:latest
           command:
             - /app
           envFrom:
@@ -68,5 +68,5 @@ kind: ConfigMap
 metadata:
   name: api-gateway-config
 data:
-  ADDRESS: 0.0.0.0:8080
-  DAPR_ADDRESS: localhost:50001
+  GATEWAYADDRESS: 0.0.0.0:8080
+  SERVICEADDRESS: localhost:50001
