@@ -2,8 +2,7 @@ SHELL = /bin/bash
 
 SERVICES = \
 	backend/api/gateway \
-	backend/svc/greeter \
-	backend/svc/echo \
+	backend/svc/time \
 
 .PHONY: all
 all: pre proto fmt lint
@@ -28,7 +27,7 @@ lint:
 
 .PHONY: proto
 proto:
-	buf mod update
+	cd api && buf mod update && cd -
 	buf generate
 
 
@@ -39,11 +38,11 @@ build:
 
 .PHONY: kind
 kind:
-	kind get clusters -q | grep "skeleton" || kind create cluster --config kind.yaml
+	kind get clusters -q | grep "_idempotencykey" || kind create cluster --config kind.yaml
 
 .PHONY: clean
 clean:
-	kind delete cluster --name skeleton
+	kind delete cluster --name _idempotencykey
 
 .PHONY: dev
 dev:
@@ -61,10 +60,8 @@ destroy-production:
 
 .PHONY: http
 http:
-	curl -i localhost:58080/greeter/v1/hello -H "Content-Type: application/json" -d '{"name": "alice"}'
-	curl -i localhost:58080/echo/v1/echo -H "Content-Type: application/json" -d '{"msg": "hoge"}'
+	curl -i localhost:58080/v1/now
 
 .PHONY: grpc
 grpc:
-	grpcurl -protoset <(buf build -o -) -plaintext -rpc-header 'dapr-app-id: svc-greeter' -d '{"name": "alice"}' localhost:50001 skeleton.greeter.v1.Greeter/Hello || true
-	grpcurl -protoset <(buf build -o -) -plaintext -rpc-header 'dapr-app-id: svc-echo' -d '{"msg": "hoge"}' localhost:50001 skeleton.echo.v1.Echo/Echo || true
+	grpcurl -protoset <(buf build -o -) -plaintext localhost:50001 kzmake.time.v1.Time/Now

@@ -1,4 +1,4 @@
-module github.com/kzmake/skeleton
+module github.com/kzmake/_idempotency-key
 
 go 1.17
 
