@@ -1,4 +1,3 @@
 ---
 resources:
-  - api-gateway.yaml
-  - svc-time.yaml
+  - time.yaml

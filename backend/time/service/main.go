@@ -20,14 +20,14 @@ import (
 
 	pb "github.com/kzmake/_idempotency-key/gen/go/time/v1"
 
-	"github.com/kzmake/_idempotency-key/backend/svc/time/handler"
+	"github.com/kzmake/_idempotency-key/backend/time/service/handler"
 )
 
 type Env struct {
 	ServiceAddress string `default:"localhost:50051"`
 }
 
-const prefix = "TIME"
+const prefix = "SERVICE"
 
 var env Env
 

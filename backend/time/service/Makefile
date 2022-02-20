@@ -7,7 +7,7 @@ pre:
 
 .PHONY: fmt
 fmt:
-	goimports -l -local "github.com/kzmake/_idempotency-key/backend/svc/time" -w .
+	goimports -l -local "github.com/kzmake/_idempotency-key/backend/time" -w .
 
 .PHONY: lint
 lint:

@@ -60,7 +60,7 @@ destroy-production:
 
 .PHONY: http
 http:
-	curl -i localhost:58080/v1/now
+	curl -i -XPOST localhost:58080/v1/now
 
 .PHONY: grpc
 grpc:

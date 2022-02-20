@@ -1,0 +1,106 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: time
+spec:
+  selector:
+    matchLabels:
+      app: time
+  template:
+    metadata:
+      labels:
+        app: time
+    spec:
+      containers:
+        - name: time-gateway
+          image: ghcr.io/kzmake/idempotency-key/time-gateway:latest
+          command:
+            - /app
+          envFrom:
+            - configMapRef:
+                name: time-gateway-config
+              prefix: GATEWAY_
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 32Mi
+          ports:
+            - name: http
+              containerPort: 8080
+          livenessProbe:
+            tcpSocket: { port: 8080 }
+            initialDelaySeconds: 10
+          readinessProbe:
+            tcpSocket: { port: 8080 }
+            initialDelaySeconds: 5
+            failureThreshold: 1
+            periodSeconds: 1
+        - name: time-service
+          image: ghcr.io/kzmake/idempotency-key/time-service:latest
+          envFrom:
+            - configMapRef:
+                name: time-service-config
+              prefix: SERVICE_
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 32Mi
+          ports:
+            - name: grpc
+              containerPort: 50051
+          livenessProbe:
+            tcpSocket: { port: 50051 }
+            initialDelaySeconds: 10
+          readinessProbe:
+            tcpSocket: { port: 50051 }
+            initialDelaySeconds: 5
+            failureThreshold: 1
+            periodSeconds: 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: time-gateway
+spec:
+  type: ClusterIP
+  selector:
+    app: time
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: time-service
+spec:
+  type: ClusterIP
+  selector:
+    app: time
+  ports:
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: time-gateway-config
+data:
+  GATEWAYADDRESS: 0.0.0.0:8080
+  SERVICEADDRESS: localhost:50051
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: time-service-config
+data:
+  SERVICEADDRESS: 0.0.0.0:50051
